@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Review.AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#070C14; --bg2:#0A1220; --panel:#0E1726; --panel2:#111F33;
+  --line:rgba(120,160,220,.13);
+  --txt:#E8EFF8; --txt2:#8FA3BF; --txt3:#5C7092;
+  --cyan:#22D3EE; --blue:#3B82F6; --indigo:#6366F1; --violet:#8B5CF6;
+  --green:#10B981; --amber:#F59E0B; --red:#EF4444;
+  --sans:'Inter',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+html,body{height:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--txt);overflow:hidden;-webkit-font-smoothing:antialiased;font-size:13px}
+
+/* ═══════════ LANDING ═══════════ */
+#landing{position:fixed;inset:0;z-index:100;background:radial-gradient(ellipse at 50% 45%,#0D1A2E 0%,#070C14 60%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;transition:opacity .9s,transform .9s}
+#landing.gone{opacity:0;transform:scale(1.06);pointer-events:none}
+
+/* neural net bg */
+.neural{position:absolute;inset:0;opacity:.5}
+.neural circle{fill:var(--cyan);opacity:.5}
+.neural line{stroke:var(--blue);stroke-width:.5;opacity:.18}
+@keyframes pulseNode{0%,100%{opacity:.2;r:1.4}50%{opacity:.85;r:2.6}}
+.neural circle{animation:pulseNode 4s ease-in-out infinite}
+
+/* particles */
+.particles{position:absolute;inset:0;pointer-events:none}
+.p{position:absolute;border-radius:50%;background:var(--cyan);opacity:0;
+   box-shadow:0 0 6px rgba(34,211,238,.9)}
+@keyframes rise{
+  0%{opacity:0;transform:translateY(0) scale(.6)}
+  15%{opacity:.9}
+  100%{opacity:0;transform:translateY(-320px) scale(.2)}
+}
+
+/* hands */
+.hands-wrap{position:relative;width:min(760px,92vw);height:300px;margin-bottom:8px}
+.hands{width:100%;height:100%;overflow:visible}
+@keyframes reachL{0%,100%{transform:translateX(-14px)}50%{transform:translateX(-2px)}}
+@keyframes reachR{0%,100%{transform:translateX(14px)}50%{transform:translateX(2px)}}
+.hand-human{animation:reachL 5s ease-in-out infinite}
+.hand-ai{animation:reachR 5s ease-in-out infinite}
+@keyframes sparkCore{0%,100%{opacity:.55;transform:scale(.82)}50%{opacity:1;transform:scale(1.18)}}
+.spark-core{animation:sparkCore 2.6s ease-in-out infinite;transform-origin:center}
+@keyframes ring{0%{opacity:.75;r:12}100%{opacity:0;r:82}}
+.ring{animation:ring 3s ease-out infinite;fill:none;stroke:var(--cyan);stroke-width:1}
+.ring:nth-of-type(2){animation-delay:1s}
+.ring:nth-of-type(3){animation-delay:2s}
+@keyframes dataFlow{to{stroke-dashoffset:-100}}
+.flow{stroke-dasharray:3 7;animation:dataFlow 2.5s linear infinite}
+
+/* content */
+.land-content{position:relative;z-index:3;text-align:center;padding:0 24px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.fu{opacity:0;animation:fadeUp .9s cubic-bezier(.2,.7,.3,1) forwards}
+.d1{animation-delay:.25s}.d2{animation-delay:.5s}.d3{animation-delay:.75s}.d4{animation-delay:1s}
+
+.land-brand{display:flex;align-items:center;justify-content:center;gap:13px;margin-bottom:26px}
+.land-mark{width:46px;height:46px;border-radius:12px;position:relative;
+  background:linear-gradient(135deg,var(--cyan),var(--indigo));display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-weight:700;font-size:21px;color:#061018;
+  box-shadow:0 0 34px rgba(34,211,238,.45)}
+.land-name{font-size:30px;font-weight:800;letter-spacing:-1px}
+.land-name em{font-style:normal;background:linear-gradient(90deg,var(--cyan),var(--violet));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.land-sub{font-size:10.5px;letter-spacing:.32em;color:var(--txt3);text-transform:uppercase;margin-top:3px}
+
+.land-h1{font-size:clamp(28px,4.6vw,50px);font-weight:800;line-height:1.1;letter-spacing:-1.6px;max-width:940px;margin:0 auto}
+.land-h1 span{background:linear-gradient(100deg,var(--cyan),var(--blue) 45%,var(--violet));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.land-p{font-size:15px;color:var(--txt2);max-width:620px;margin:20px auto 0;line-height:1.75}
+
+.land-cta{margin-top:36px;display:flex;gap:13px;justify-content:center;flex-wrap:wrap}
+.btn-main{padding:14px 34px;border:none;border-radius:11px;font-size:14px;font-weight:600;cursor:pointer;
+  background:linear-gradient(135deg,var(--cyan),var(--indigo));color:#05101A;
+  box-shadow:0 8px 30px rgba(34,211,238,.32);transition:transform .25s,box-shadow .25s;font-family:var(--sans)}
+.btn-main:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(34,211,238,.5)}
+.btn-ghost{padding:14px 28px;border:1px solid var(--line);border-radius:11px;font-size:14px;cursor:pointer;
+  background:rgba(255,255,255,.03);color:var(--txt);font-family:var(--sans);transition:border-color .25s}
+.btn-ghost:hover{border-color:rgba(34,211,238,.5)}
+
+.land-stats{margin-top:52px;display:flex;gap:46px;justify-content:center;flex-wrap:wrap}
+.ls .n{font-family:var(--mono);font-size:21px;font-weight:600;
+  background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+.ls .l{font-size:10.5px;color:var(--txt3);letter-spacing:.09em;text-transform:uppercase;margin-top:3px}
+
+/* ═══════════ LOGIN ═══════════ */
+#login{position:fixed;inset:0;z-index:90;background:radial-gradient(ellipse at 50% 40%,#0C1727,#070C14 65%);
+  display:none;align-items:center;justify-content:center}
+#login.on{display:flex;animation:fadeUp .6s}
+.log-card{width:400px;background:rgba(14,23,38,.86);border:1px solid var(--line);border-radius:20px;padding:40px 36px;
+  backdrop-filter:blur(22px);box-shadow:0 26px 70px rgba(0,0,0,.6)}
+.log-brand{display:flex;align-items:center;gap:11px;justify-content:center;margin-bottom:8px}
+.log-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--cyan),var(--indigo));
+  display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;color:#061018;
+  box-shadow:0 0 22px rgba(34,211,238,.4)}
+.log-name{font-size:20px;font-weight:700;letter-spacing:-.5px}
+.log-name em{font-style:normal;color:var(--cyan)}
+.log-tag{text-align:center;font-size:11px;color:var(--txt3);letter-spacing:.09em;margin-bottom:26px}
+.demo-flag{background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.32);border-radius:9px;padding:10px 13px;
+  font-size:11.5px;color:#A5B4FC;margin-bottom:20px;line-height:1.55}
+.fld{margin-bottom:12px}
+.fld label{display:block;font-size:10px;letter-spacing:.1em;color:var(--txt3);text-transform:uppercase;margin-bottom:6px}
+.fld input{width:100%;padding:11px 14px;background:rgba(255,255,255,.04);border:1px solid var(--line);
+  border-radius:9px;color:var(--txt);font-size:13px;font-family:var(--mono);outline:none;transition:border-color .2s}
+.fld input:focus{border-color:var(--cyan)}
+.btn-log{width:100%;padding:13px;margin-top:8px;border:none;border-radius:9px;cursor:pointer;font-weight:600;font-size:13.5px;
+  background:linear-gradient(135deg,var(--cyan),var(--indigo));color:#05101A;font-family:var(--sans)}
+.btn-log:hover{opacity:.92}
+.log-foot{text-align:center;margin-top:18px;font-size:11px;color:var(--txt3)}
+
+
+/* ═══════════ INTAKE (dépôt en masse) ═══════════ */
+#intake{position:fixed;inset:0;z-index:80;background:var(--bg);display:none;flex-direction:column}
+#intake.on{display:flex;animation:fadeUp .5s}
+.ik-body{flex:1;overflow-y:auto;padding:28px 34px 40px;max-width:1240px;margin:0 auto;width:100%}
+.ik-h1{font-size:25px;font-weight:700;letter-spacing:-.6px}
+.ik-sub{font-size:13px;color:var(--txt2);margin-top:6px;line-height:1.7;max-width:720px}
+
+.drop{margin-top:24px;border:1.5px dashed rgba(34,211,238,.4);border-radius:18px;padding:40px 30px;text-align:center;
+  background:linear-gradient(160deg,rgba(34,211,238,.06),rgba(99,102,241,.04));cursor:pointer;transition:border-color .25s,background .25s}
+.drop:hover{border-color:rgba(34,211,238,.8);background:linear-gradient(160deg,rgba(34,211,238,.1),rgba(99,102,241,.07))}
+.drop-ic{font-size:34px;margin-bottom:12px}
+.drop-t{font-size:16px;font-weight:600}
+.drop-d{font-size:12.5px;color:var(--txt2);margin-top:7px;line-height:1.7}
+.drop-x{font-size:11.5px;color:var(--txt3);margin-top:13px;font-family:var(--mono)}
+
+.proc{margin-top:22px;display:none}
+.proc.on{display:block}
+.proc-h{display:flex;align-items:center;gap:11px;font-size:13.5px;font-weight:600;margin-bottom:14px}
+.spin{width:16px;height:16px;border:2px solid rgba(34,211,238,.25);border-top-color:var(--cyan);border-radius:50%;
+  animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.steps{border:1px solid var(--line);border-radius:13px;background:var(--panel);overflow:hidden}
+.step{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,.04);font-size:12.5px}
+.step:last-child{border-bottom:none}
+.step .si{width:20px;text-align:center;font-size:13px}
+.step .sn{color:var(--txt2)}
+.step.done .sn{color:var(--txt)}
+.step.done .si{color:#34D399}
+.step.run .si{color:var(--cyan)}
+.step .sv{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--txt3)}
+.step.done .sv{color:#6EE7B7}
+
+.res{margin-top:26px;display:none}
+.res.on{display:block;animation:fadeUp .6s}
+.res-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:22px}
+.kpi{border:1px solid var(--line);border-radius:13px;padding:15px 17px;background:var(--panel)}
+.kpi .n{font-family:var(--mono);font-size:25px;font-weight:700;margin-top:3px}
+.kpi .l{font-size:11.5px;color:var(--txt2)}
+.kpi.ok{background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.3)}.kpi.ok .n{color:#34D399}
+.kpi.wn{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.3)}.kpi.wn .n{color:#FCD34D}
+.kpi.bd{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.3)}.kpi.bd .n{color:#FCA5A5}
+
+.res-h{font-size:14px;font-weight:600;margin:22px 0 12px}
+.dos{border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:14px 17px;margin-bottom:10px;
+  display:flex;align-items:flex-start;gap:14px;cursor:pointer;transition:border-color .2s}
+.dos:hover{border-color:rgba(34,211,238,.45)}
+.dos-ic{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.di-ok{background:rgba(16,185,129,.15);color:#34D399}
+.di-wn{background:rgba(245,158,11,.15);color:#FCD34D}
+.di-bd{background:rgba(239,68,68,.15);color:#FCA5A5}
+.dos-n{font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.dos-m{font-size:11.5px;color:var(--txt3);margin-top:4px;display:flex;gap:9px;flex-wrap:wrap}
+.dos-m span:not(:last-child)::after{content:"·";margin-left:9px}
+.dos-r{font-size:11.5px;color:var(--txt2);margin-top:7px;line-height:1.6}
+.dos-r b{color:#FCD34D;font-weight:600}
+.dos-a{margin-left:auto;display:flex;flex-direction:column;gap:7px;align-items:flex-end;flex-shrink:0}
+.tagx{font-size:10.5px;padding:3px 10px;border-radius:20px;font-weight:600;white-space:nowrap}
+.t-ok{background:rgba(16,185,129,.16);color:#34D399}
+.t-wn{background:rgba(245,158,11,.16);color:#FCD34D}
+.t-bd{background:rgba(239,68,68,.16);color:#FCA5A5}
+.t-mut{background:rgba(255,255,255,.07);color:var(--txt3)}
+.btn-xs{padding:7px 13px;border:1px solid rgba(34,211,238,.4);background:rgba(34,211,238,.08);border-radius:8px;
+  font-size:11.5px;color:var(--cyan);cursor:pointer;font-weight:600;white-space:nowrap;font-family:var(--sans)}
+.btn-xs.warn{border-color:rgba(245,158,11,.45);background:rgba(245,158,11,.1);color:#FCD34D}
+.files-x{font-size:11px;color:var(--txt3);font-family:var(--mono);margin-top:6px;line-height:1.7}
+.files-x i{font-style:normal;opacity:.6}
+
+/* ═══════════ APP ═══════════ */
+#app{position:fixed;inset:0;display:none;flex-direction:column}
+#app.on{display:flex;animation:fadeUp .5s}
+.topbar{height:56px;background:var(--bg2);border-bottom:1px solid var(--line);display:flex;align-items:center;
+  padding:0 18px;gap:16px;flex-shrink:0}
+.tb-brand{display:flex;align-items:center;gap:10px;width:200px}
+.tb-mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--cyan),var(--indigo));
+  display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:14px;color:#061018}
+.tb-name{font-size:15px;font-weight:700;letter-spacing:-.3px;line-height:1.1}
+.tb-name em{font-style:normal;color:var(--cyan)}
+.tb-name small{display:block;font-size:7.5px;letter-spacing:.2em;color:var(--txt3);font-weight:500}
+.search{flex:1;max-width:620px;margin:0 auto;position:relative}
+.search input{width:100%;padding:9px 14px 9px 38px;background:rgba(255,255,255,.04);border:1px solid var(--line);
+  border-radius:9px;color:var(--txt);font-size:12.5px;outline:none;font-family:var(--sans)}
+.search input:focus{border-color:rgba(34,211,238,.45)}
+.search .ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--txt3);font-size:13px}
+.search .kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:10px;
+  color:var(--txt3);border:1px solid var(--line);border-radius:4px;padding:2px 6px}
+.tb-right{display:flex;align-items:center;gap:14px;margin-left:auto}
+.tb-ico{position:relative;color:var(--txt2);cursor:pointer;font-size:16px}
+.tb-dot{position:absolute;top:-4px;right:-5px;min-width:15px;height:15px;background:var(--red);border-radius:8px;
+  font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;color:#fff}
+.tb-user{display:flex;align-items:center;gap:9px;cursor:pointer}
+.tb-av{width:31px;height:31px;border-radius:50%;background:linear-gradient(135deg,var(--indigo),var(--violet));
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.tb-un{font-size:12.5px;font-weight:600;line-height:1.2}
+.tb-ur{font-size:10.5px;color:var(--txt3)}
+
+.body{flex:1;display:flex;overflow:hidden}
+
+/* sidebar */
+.side{width:205px;background:var(--bg2);border-right:1px solid var(--line);padding:12px 9px;overflow-y:auto;flex-shrink:0;
+  display:flex;flex-direction:column}
+.s-item{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:8px;font-size:12.5px;color:var(--txt2);
+  cursor:pointer;margin-bottom:2px}
+.s-item:hover{background:rgba(255,255,255,.04);color:var(--txt)}
+.s-item.on{background:rgba(34,211,238,.1);color:var(--cyan)}
+.s-item .ct{margin-left:auto;font-size:10px;background:var(--red);border-radius:8px;padding:1px 6px;color:#fff;font-weight:700}
+.s-item .ct.mut{background:rgba(255,255,255,.1);color:var(--txt2)}
+.s-sub{padding-left:22px}
+.s-sub .s-item{font-size:12px;padding:6px 11px}
+.s-ent{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:8px;font-size:12.5px;cursor:pointer;
+  background:rgba(34,211,238,.08);color:var(--cyan);font-weight:600;margin-bottom:2px}
+.s-help{margin-top:auto;border:1px solid var(--line);border-radius:11px;padding:12px;font-size:11.5px;color:var(--txt2)}
+.s-help b{display:block;color:var(--txt);font-size:12px;margin-bottom:2px}
+
+/* main */
+.main{flex:1;overflow-y:auto;background:var(--bg);min-width:0}
+.ent-head{padding:18px 24px 0}
+.ent-top{display:flex;align-items:flex-start;gap:14px}
+.ent-logo{width:46px;height:46px;border-radius:11px;background:var(--panel2);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:20px}
+.ent-name{font-size:22px;font-weight:700;letter-spacing:-.5px;display:flex;align-items:center;gap:10px}
+.pill-ok{font-size:10.5px;background:rgba(16,185,129,.16);color:#34D399;padding:3px 10px;border-radius:20px;font-weight:600}
+.ent-meta{font-size:11.5px;color:var(--txt3);margin-top:5px;display:flex;gap:9px;flex-wrap:wrap}
+.ent-meta span:not(:last-child)::after{content:"·";margin-left:9px;color:var(--txt3)}
+.ent-act{margin-left:auto;display:flex;gap:9px}
+.sel{padding:8px 13px;background:var(--panel);border:1px solid var(--line);border-radius:8px;font-size:12.5px;
+  color:var(--txt);cursor:pointer}
+.tabs{display:flex;gap:2px;margin-top:16px;border-bottom:1px solid var(--line)}
+.tab{padding:10px 15px;font-size:12.5px;color:var(--txt2);cursor:pointer;border-bottom:2px solid transparent}
+.tab:hover{color:var(--txt)}
+.tab.on{color:var(--cyan);border-bottom-color:var(--cyan)}
+
+.trx{padding:16px 24px 24px}
+.trx-nav{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--txt2);cursor:pointer;margin-bottom:10px}
+.trx-head{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.trx-id{font-size:21px;font-weight:700;letter-spacing:-.4px}
+.trx-meta{font-size:11.5px;color:var(--txt3);margin-top:5px;display:flex;gap:14px;flex-wrap:wrap}
+.trx-btns{margin-left:auto;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.btn-o{padding:9px 16px;border:1px solid rgba(34,211,238,.4);background:rgba(34,211,238,.07);border-radius:8px;
+  font-size:12.5px;color:var(--cyan);cursor:pointer;font-weight:600;font-family:var(--sans)}
+.vtabs{display:flex;gap:6px;margin:16px 0 0}
+.vtab{padding:8px 15px;border:1px solid var(--line);border-radius:8px;font-size:12.5px;color:var(--txt2);cursor:pointer;background:var(--panel)}
+.vtab.on{background:rgba(34,211,238,.12);border-color:rgba(34,211,238,.45);color:var(--cyan);font-weight:600}
+
+/* impact graph */
+.graph{margin-top:14px;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:16px;overflow-x:auto}
+.g-cols{display:flex;gap:14px;min-width:1080px}
+.g-col{flex:1;min-width:150px}
+.g-lbl{font-size:10.5px;color:var(--txt3);margin-bottom:10px;font-weight:600;letter-spacing:.02em}
+.node{border-radius:10px;padding:11px 12px;margin-bottom:9px;cursor:pointer;position:relative;
+  border:1px solid;transition:transform .18s,box-shadow .18s}
+.node:hover{transform:translateY(-2px)}
+.node .nt{font-size:11.5px;font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.node .nv{font-family:var(--mono);font-size:11px;opacity:.92}
+.node .ns{font-size:10px;opacity:.65;margin-top:3px}
+.n-blue{background:rgba(59,130,246,.11);border-color:rgba(59,130,246,.42);color:#93C5FD}
+.n-blue:hover{box-shadow:0 6px 22px rgba(59,130,246,.22)}
+.n-green{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.4);color:#6EE7B7}
+.n-green:hover{box-shadow:0 6px 22px rgba(16,185,129,.2)}
+.n-cyan{background:rgba(34,211,238,.1);border-color:rgba(34,211,238,.42);color:#67E8F9}
+.n-cyan:hover{box-shadow:0 6px 22px rgba(34,211,238,.22)}
+.n-violet{background:rgba(139,92,246,.11);border-color:rgba(139,92,246,.42);color:#C4B5FD}
+.n-violet:hover{box-shadow:0 6px 22px rgba(139,92,246,.22)}
+.n-amber{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.4);color:#FCD34D}
+.n-amber:hover{box-shadow:0 6px 22px rgba(245,158,11,.2)}
+.conf{font-size:10px;color:var(--txt3);margin-top:7px;display:flex;align-items:center;gap:5px}
+.conf b{color:#6EE7B7}
+
+/* detail tabs */
+.dtabs{display:flex;gap:2px;margin-top:18px;border-bottom:1px solid var(--line);overflow-x:auto}
+.dtab{padding:10px 14px;font-size:12px;color:var(--txt2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.dtab.on{color:var(--cyan);border-bottom-color:var(--cyan)}
+.dgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:16px}
+.card{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:14px 16px}
+.card h4{font-size:12.5px;font-weight:600;margin-bottom:12px;display:flex;align-items:center}
+.card h4 a{margin-left:auto;font-size:11px;color:var(--cyan);cursor:pointer;text-decoration:none}
+.kv{display:flex;justify-content:space-between;padding:5px 0;font-size:11.5px}
+.kv .k{color:var(--txt3)}
+.kv .v{font-family:var(--mono);color:var(--txt)}
+.doc{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.doc .di{width:26px;height:26px;border-radius:6px;background:rgba(239,68,68,.14);color:#FCA5A5;
+  display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.doc .dn{font-size:11.5px}
+.doc .dd{font-size:10px;color:var(--txt3)}
+.doc .dt{margin-left:auto;font-size:10px;color:var(--txt3)}
+.rule{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.rule .ri{width:26px;height:26px;border-radius:6px;background:rgba(16,185,129,.14);color:#6EE7B7;
+  display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.rule .rn{font-size:11.5px;font-weight:500}
+.rule .rd{font-size:10px;color:var(--txt3);margin-top:1px}
+
+/* donut */
+.donut-wrap{display:flex;align-items:center;gap:18px}
+.leg{flex:1}
+.leg-row{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11px}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.leg-v{margin-left:auto;font-family:var(--mono);color:var(--txt)}
+
+/* assistant */
+.asst{width:310px;background:var(--bg2);border-left:1px solid var(--line);padding:16px;overflow-y:auto;flex-shrink:0}
+.asst-h{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;margin-bottom:14px}
+.asst-h .sp{color:var(--violet);font-size:15px}
+.asst-box{background:linear-gradient(145deg,rgba(59,130,246,.15),rgba(99,102,241,.1));
+  border:1px solid rgba(99,102,241,.3);border-radius:13px;padding:14px}
+.asst-q{font-size:12.5px;font-weight:600;margin-bottom:9px;color:#BFDBFE}
+.asst-a{font-size:12px;line-height:1.7;color:#CBD5E1}
+.asst-in{margin-top:12px;position:relative}
+.asst-in input{width:100%;padding:10px 40px 10px 13px;background:rgba(255,255,255,.04);border:1px solid var(--line);
+  border-radius:9px;color:var(--txt);font-size:12px;outline:none;font-family:var(--sans)}
+.asst-in button{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:28px;height:28px;border:none;
+  border-radius:7px;background:var(--indigo);color:#fff;cursor:pointer;font-size:12px}
+.alert-c{margin-top:18px;border:1px solid rgba(239,68,68,.35);border-radius:13px;background:rgba(239,68,68,.07);padding:14px}
+.alert-h{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:#FCA5A5;margin-bottom:10px}
+.alert-t{font-size:12.5px;font-weight:600;color:#FCA5A5;margin-bottom:6px}
+.alert-d{font-size:11.5px;color:var(--txt2);line-height:1.6}
+.alert-m{display:flex;align-items:center;gap:8px;margin-top:11px}
+.alert-m .am{font-family:var(--mono);font-size:14px;font-weight:600;color:#FCA5A5}
+.alert-m .ab{margin-left:auto;font-size:10px;background:rgba(239,68,68,.2);color:#FCA5A5;padding:3px 9px;border-radius:20px}
+.alert-btns{display:flex;gap:8px;margin-top:12px}
+.ab1{flex:1;padding:8px;border:none;border-radius:8px;background:var(--indigo);color:#fff;font-size:11.5px;cursor:pointer;font-weight:600;font-family:var(--sans)}
+.ab2{flex:1;padding:8px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--txt2);font-size:11.5px;cursor:pointer;font-family:var(--sans)}
+.sim{margin-top:18px}
+.sim-h{font-size:12.5px;font-weight:600;margin-bottom:10px;display:flex}
+.sim-h a{margin-left:auto;font-size:11px;color:var(--cyan);cursor:pointer}
+.sim-r{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.sim-ok{color:#34D399;font-size:12px}
+.sim-id{font-family:var(--mono);font-size:11px}
+.sim-d{font-size:10px;color:var(--txt3)}
+.sim-v{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--txt2)}
+
+/* insight banner */
+.insight{margin:18px 24px 24px;border-radius:13px;padding:14px 18px;display:flex;align-items:center;gap:14px;
+  background:linear-gradient(100deg,rgba(139,92,246,.16),rgba(59,130,246,.1));border:1px solid rgba(139,92,246,.3)}
+.ins-i{width:32px;height:32px;border-radius:9px;background:rgba(139,92,246,.24);display:flex;align-items:center;
+  justify-content:center;font-size:15px;flex-shrink:0}
+.ins-t{font-size:12.5px;font-weight:600;color:#C4B5FD;margin-bottom:2px}
+.ins-d{font-size:12px;color:var(--txt2)}
+.ins-b{margin-left:auto;padding:9px 16px;border:none;border-radius:9px;background:var(--violet);color:#fff;
+  font-size:12px;cursor:pointer;font-weight:600;white-space:nowrap;font-family:var(--sans)}
+</style>
+</head>
+<body>
+
+<!-- ══════════ LANDING ══════════ -->
+<div id="landing">
+  <svg class="neural" id="neural" preserveAspectRatio="none"></svg>
+  <div class="particles" id="particles"></div>
+
+  <div class="land-content">
+    <div class="land-brand fu">
+      <div class="land-mark">R</div>
+      <div style="text-align:left">
+        <div class="land-name">Review<em>.AI</em></div>
+        <div class="land-sub">Tax · Finance · Intelligence</div>
+      </div>
+    </div>
+
+    <div class="hands-wrap fu d1">
+      <svg class="hands" viewBox="0 0 760 300">
+        <defs>
+          <linearGradient id="gHuman" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#7DD3FC" stop-opacity=".25"/>
+            <stop offset="100%" stop-color="#38BDF8" stop-opacity=".95"/>
+          </linearGradient>
+          <linearGradient id="gAI" x1="1" y1="0" x2="0" y2="0">
+            <stop offset="0%" stop-color="#A78BFA" stop-opacity=".25"/>
+            <stop offset="100%" stop-color="#8B5CF6" stop-opacity=".95"/>
+          </linearGradient>
+          <radialGradient id="gSpark">
+            <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
+            <stop offset="30%" stop-color="#67E8F9" stop-opacity=".9"/>
+            <stop offset="100%" stop-color="#22D3EE" stop-opacity="0"/>
+          </radialGradient>
+          <filter id="blur"><feGaussianBlur stdDeviation="7"/></filter>
+        </defs>
+
+        <!-- human hand (left), stylised -->
+        <g class="hand-human" fill="none" stroke="url(#gHuman)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M95 218 C130 214, 168 206, 205 192 L258 170"/>
+          <path d="M120 186 C160 176, 200 164, 240 150 L286 134"/>
+          <path d="M132 156 C172 148, 212 138, 250 126 L300 112"/>
+          <path d="M148 128 C186 122, 224 114, 260 104 L308 92"/>
+          <path d="M108 246 C140 246, 176 240, 210 230 L252 216"/>
+          <path d="M258 170 C288 162, 310 152, 330 142"/>
+          <path d="M286 134 C306 128, 322 122, 338 116"/>
+          <path d="M300 112 C316 108, 330 104, 344 100"/>
+          <circle cx="330" cy="142" r="3" fill="#38BDF8" stroke="none" opacity=".9"/>
+          <circle cx="338" cy="116" r="3" fill="#38BDF8" stroke="none" opacity=".9"/>
+          <circle cx="344" cy="100" r="3" fill="#38BDF8" stroke="none" opacity=".9"/>
+          <circle cx="252" cy="216" r="3" fill="#38BDF8" stroke="none" opacity=".7"/>
+        </g>
+
+        <!-- AI hand (right), geometric/circuit -->
+        <g class="hand-ai" fill="none" stroke="url(#gAI)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M665 218 C630 214, 592 206, 555 192 L502 170"/>
+          <path d="M640 186 C600 176, 560 164, 520 150 L474 134"/>
+          <path d="M628 156 C588 148, 548 138, 510 126 L460 112"/>
+          <path d="M612 128 C574 122, 536 114, 500 104 L452 92"/>
+          <path d="M652 246 C620 246, 584 240, 550 230 L508 216"/>
+          <path d="M502 170 C472 162, 450 152, 430 142"/>
+          <path d="M474 134 C454 128, 438 122, 422 116"/>
+          <path d="M460 112 C444 108, 430 104, 416 100"/>
+          <!-- circuit joints -->
+          <rect x="426" y="138" width="7" height="7" fill="#8B5CF6" stroke="none" opacity=".95"/>
+          <rect x="418" y="112" width="7" height="7" fill="#8B5CF6" stroke="none" opacity=".95"/>
+          <rect x="412" y="96" width="7" height="7" fill="#8B5CF6" stroke="none" opacity=".95"/>
+          <rect x="504" y="212" width="7" height="7" fill="#8B5CF6" stroke="none" opacity=".7"/>
+          <path d="M600 200 L618 200 L618 178" stroke-width="1.1" opacity=".55"/>
+          <path d="M580 160 L596 160 L596 140" stroke-width="1.1" opacity=".55"/>
+          <path d="M620 224 L640 224" stroke-width="1.1" opacity=".45"/>
+        </g>
+
+        <!-- contact sparks -->
+        <g transform="translate(380,120)">
+          <circle class="ring" cx="0" cy="0"/>
+          <circle class="ring" cx="0" cy="0"/>
+          <circle class="ring" cx="0" cy="0"/>
+          <circle class="spark-core" cx="0" cy="0" r="46" fill="url(#gSpark)" filter="url(#blur)"/>
+          <circle class="spark-core" cx="0" cy="0" r="7" fill="#fff"/>
+        </g>
+
+        <!-- data flowing between hands -->
+        <g stroke="#67E8F9" stroke-width="1.3" opacity=".8" fill="none">
+          <path class="flow" d="M344 100 C362 104, 368 112, 375 118"/>
+          <path class="flow" d="M338 116 C356 118, 366 118, 374 120"/>
+          <path class="flow" d="M330 142 C350 136, 364 128, 374 122"/>
+          <path class="flow" d="M416 100 C398 104, 392 112, 385 118"/>
+          <path class="flow" d="M422 116 C404 118, 394 118, 386 120"/>
+          <path class="flow" d="M430 142 C410 136, 396 128, 386 122"/>
+        </g>
+      </svg>
+    </div>
+
+    <h1 class="land-h1 fu d2">L'intelligence qui comprend<br><span>vos chiffres, vos règles, vos risques.</span></h1>
+    <p class="land-p fu d3">Déposez vos balances et grands livres en vrac. Review.AI identifie les entreprises,
+      reconstitue les dossiers, produit les états financiers SYSCOHADA, la DSF et la revue fiscale —
+      et explique chaque montant jusqu'à l'écriture d'origine.</p>
+
+    <div class="land-cta fu d3">
+      <button class="btn-main" onclick="toLogin()">Entrer dans Review.AI →</button>
+      <button class="btn-ghost" onclick="toLogin()">Voir la démo</button>
+    </div>
+
+    <div class="land-stats fu d4">
+      <div class="ls"><div class="n">5</div><div class="l">Modèles DSF</div></div>
+      <div class="ls"><div class="n">100%</div><div class="l">Traçabilité</div></div>
+      <div class="ls"><div class="n">L0→L3</div><div class="l">Validation humaine</div></div>
+      <div class="ls"><div class="n">OHADA</div><div class="l">SYSCOHADA révisé</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ LOGIN ══════════ -->
+<div id="login">
+  <div class="log-card">
+    <div class="log-brand"><div class="log-mark">R</div><div class="log-name">Review<em>.AI</em></div></div>
+    <div class="log-tag">TAX · FINANCE · INTELLIGENCE</div>
+    <div class="demo-flag">Mode démo — identifiants pré-remplis, aucune authentification réelle n'est effectuée.</div>
+    <div class="fld"><label>Identifiant</label><input value="demo@review-ai.africa" readonly></div>
+    <div class="fld"><label>Mot de passe</label><input type="password" value="demo-2026"></div>
+    <button class="btn-log" onclick="toIntake()">Entrer en mode démo →</button>
+    <div class="log-foot">Cabinet démo · Douala, Cameroun</div>
+  </div>
+</div>
+
+
+<!-- ══════════ INTAKE — dépôt en masse ══════════ -->
+<div id="intake">
+  <div class="topbar">
+    <div class="tb-brand">
+      <div class="tb-mark">R</div>
+      <div class="tb-name">Review<em>.AI</em><small>TAX · FINANCE · INTELLIGENCE</small></div>
+    </div>
+    <div class="search">
+      <span class="ico">⌕</span>
+      <input placeholder="Rechercher un client, un compte, une opération, une règle...">
+      <span class="kbd">⌘K</span>
+    </div>
+    <div class="tb-right">
+      <div class="tb-ico">🔔<span class="tb-dot">5</span></div>
+      <div class="tb-user"><div class="tb-av">JD</div>
+        <div><div class="tb-un">Jean Dupont</div><div class="tb-ur">Partner</div></div></div>
+    </div>
+  </div>
+
+  <div class="ik-body">
+    <div class="ik-h1">Déposer des documents</div>
+    <div class="ik-sub">Déposez les balances et grands livres de vos clients — dans n'importe quel ordre,
+      sans les renommer, sans les trier. Review.AI identifie les entreprises, reconstitue les dossiers
+      et lance les traitements.</div>
+
+    <div class="drop" onclick="runIntake()">
+      <div class="drop-ic">⇪</div>
+      <div class="drop-t">Glissez vos fichiers ici</div>
+      <div class="drop-d">Balances N et N-1, grands livres, PV d'AG, déclarations fiscales, justificatifs…<br>
+        Plusieurs entreprises peuvent être mélangées dans le même dépôt.</div>
+      <div class="drop-x">XLSX · XLS · CSV · PDF · JPG — 200 Mo max par fichier</div>
+    </div>
+
+    <div class="proc" id="proc">
+      <div class="proc-h"><div class="spin"></div><span id="proc-label">Traitement du lot #0087 — 24 fichiers</span></div>
+      <div class="steps" id="steps">
+        <div class="step" data-v="24 fichiers"><span class="si">○</span><span class="sn">Empreinte et détection du type de fichier</span><span class="sv"></span></div>
+        <div class="step" data-v="10 entités"><span class="si">○</span><span class="sn">Résolution d'entité — NIU, RCCM, raison sociale</span><span class="sv"></span></div>
+        <div class="step" data-v="2 doublons"><span class="si">○</span><span class="sn">Déduplication par empreinte</span><span class="sv"></span></div>
+        <div class="step" data-v="exercice 2025"><span class="si">○</span><span class="sn">Résolution de période</span><span class="sv"></span></div>
+        <div class="step" data-v="1 conflit"><span class="si">○</span><span class="sn">Résolution de version — cascade de certification</span><span class="sv"></span></div>
+        <div class="step" data-v="10 dossiers"><span class="si">○</span><span class="sn">Constitution des dossiers</span><span class="sv"></span></div>
+        <div class="step" data-v="7 lancés"><span class="si">○</span><span class="sn">Dispatch automatique vers les workers</span><span class="sv"></span></div>
+      </div>
+    </div>
+
+    <div class="res" id="res">
+      <div class="res-kpi">
+        <div class="kpi"><div class="l">Fichiers déposés</div><div class="n">24</div></div>
+        <div class="kpi ok"><div class="l">Dossiers lancés</div><div class="n">7</div></div>
+        <div class="kpi wn"><div class="l">À arbitrer</div><div class="n">2</div></div>
+        <div class="kpi bd"><div class="l">Bloqués</div><div class="n">1</div></div>
+      </div>
+
+      <div class="res-h">✓ Constitués et lancés automatiquement</div>
+
+      <div class="dos" onclick="toApp()">
+        <div class="dos-ic di-ok">🏢</div>
+        <div>
+          <div class="dos-n">ABC SARL <span class="tagx t-ok">Lancé</span></div>
+          <div class="dos-m"><span>NIU M0718…345A</span><span>Commerce de détail</span><span>Exercice 2025</span><span>DSF Normal</span></div>
+          <div class="files-x">BG_2025.xlsx <i>→ ABC-SARL_BG_N_2025.xlsx</i><br>
+            grandlivre.xls <i>→ ABC-SARL_GL_N_2025.xlsx</i><br>
+            scan023.pdf <i>→ ABC-SARL_PV-AG_2025.pdf</i></div>
+        </div>
+        <div class="dos-a"><span class="tagx t-mut">NIU exact · 100%</span><button class="btn-xs">Ouvrir →</button></div>
+      </div>
+
+      <div class="dos" onclick="toApp()">
+        <div class="dos-ic di-ok">🏢</div>
+        <div>
+          <div class="dos-n">XYZ SA <span class="tagx t-ok">Lancé</span></div>
+          <div class="dos-m"><span>NIU M0714…881C</span><span>Agro-industrie</span><span>Exercice 2025</span><span>DSF Normal</span></div>
+          <div class="files-x">balance_finale.xlsx <i>→ XYZ-SA_BG_N_2025.xlsx</i><br>
+            BG2024.xlsx <i>→ XYZ-SA_BG_N-1_2024.xlsx</i><br>
+            export_GL.xls <i>→ XYZ-SA_GL_N_2025.xlsx</i></div>
+        </div>
+        <div class="dos-a"><span class="tagx t-mut">NIU exact · 100%</span><button class="btn-xs">Ouvrir →</button></div>
+      </div>
+
+      <div class="dos" onclick="toApp()">
+        <div class="dos-ic di-ok">🏢</div>
+        <div>
+          <div class="dos-n">MNO Holding <span class="tagx t-ok">Lancé</span></div>
+          <div class="dos-m"><span>RCCM RC/DLA/2018/B/774</span><span>Services</span><span>Exercice 2025</span><span>DSF SMT</span></div>
+          <div class="files-x">doc_scan_44.pdf <i>→ MNO-HOLDING_BG_N_2025.pdf</i> <span style="color:#6EE7B7">· OCR</span><br>
+            gl_mno.csv <i>→ MNO-HOLDING_GL_N_2025.csv</i></div>
+        </div>
+        <div class="dos-a"><span class="tagx t-mut">RCCM exact · 98%</span><button class="btn-xs">Ouvrir →</button></div>
+      </div>
+
+      <div class="dos" onclick="toApp()">
+        <div class="dos-ic di-ok">🏢</div>
+        <div>
+          <div class="dos-n">+ 4 autres dossiers <span class="tagx t-ok">Lancés</span></div>
+          <div class="dos-m"><span>KAM SARL</span><span>SOTRA SA</span><span>NDE &amp; Fils</span><span>PRIMA SARL</span></div>
+        </div>
+        <div class="dos-a"><button class="btn-xs">Tout voir →</button></div>
+      </div>
+
+      <div class="res-h" style="color:#FCD34D">⚠ Nécessitent votre intervention</div>
+
+      <div class="dos">
+        <div class="dos-ic di-wn">⚠</div>
+        <div>
+          <div class="dos-n">BETA SARL <span style="color:var(--txt3);font-weight:400">ou</span> BETA SERVICES SARL
+            <span class="tagx t-wn">Deux entités candidates</span></div>
+          <div class="dos-m"><span>3 fichiers concernés</span><span>Aucun NIU lisible</span></div>
+          <div class="dos-r">Deux entités correspondent au nom extrait, avec des scores proches
+            (<b>0,87</b> et <b>0,84</b>). Review.AI ne tranche pas : un rattachement erroné
+            contaminerait les deux dossiers.</div>
+        </div>
+        <div class="dos-a"><span class="tagx t-mut">COMPETING_ENTITY_MATCH</span><button class="btn-xs warn">Arbitrer →</button></div>
+      </div>
+
+      <div class="dos">
+        <div class="dos-ic di-wn">⚠</div>
+        <div>
+          <div class="dos-n">DELTA SA <span class="tagx t-wn">Deux balances concurrentes</span></div>
+          <div class="dos-m"><span>Exercice 2025</span><span>Aucune certifiée</span></div>
+          <div class="dos-r">Deux balances N candidates : <code>BG_final.xlsx</code> et
+            <code>balance2025_corrigee.xlsx</code>. Ni le nom du fichier ni la date de dépôt
+            ne constituent une preuve — <b>sélection humaine requise</b>.</div>
+        </div>
+        <div class="dos-a"><span class="tagx t-mut">COMPETING_BALANCE_VERSIONS</span><button class="btn-xs warn">Choisir →</button></div>
+      </div>
+
+      <div class="res-h" style="color:#FCA5A5">🔴 Bloqué</div>
+
+      <div class="dos">
+        <div class="dos-ic di-bd">⛔</div>
+        <div>
+          <div class="dos-n">EPSILON SARL <span class="tagx t-bd">Document manquant</span></div>
+          <div class="dos-m"><span>NIU M0719…206F</span><span>BTP</span><span>1 fichier reçu</span></div>
+          <div class="dos-r">Seul le grand livre a été déposé. La balance générale N est indispensable :
+            aucune production n'est possible tant qu'elle manque.</div>
+        </div>
+        <div class="dos-a"><span class="tagx t-mut">BLOCKING</span><button class="btn-xs">Demander →</button></div>
+      </div>
+
+      <div class="dos" style="cursor:default;opacity:.6">
+        <div class="dos-ic" style="background:rgba(255,255,255,.06);color:var(--txt3)">ℹ</div>
+        <div>
+          <div class="dos-n" style="font-weight:500">2 fichiers ignorés (doublons)</div>
+          <div class="dos-m"><span>Empreinte déjà connue pour l'entité résolue</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ APP ══════════ -->
+<div id="app">
+  <div class="topbar">
+    <div class="tb-brand">
+      <div class="tb-mark">R</div>
+      <div class="tb-name">Review<em>.AI</em><small>TAX · FINANCE · INTELLIGENCE</small></div>
+    </div>
+    <div class="search">
+      <span class="ico">⌕</span>
+      <input placeholder="Rechercher un client, un compte, une opération, une règle...">
+      <span class="kbd">⌘K</span>
+    </div>
+    <div class="tb-right">
+      <div class="tb-ico">🔔<span class="tb-dot">5</span></div>
+      <div class="tb-ico">◐</div>
+      <div class="tb-user">
+        <div class="tb-av">JD</div>
+        <div><div class="tb-un">Jean Dupont</div><div class="tb-ur">Partner</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="body">
+    <!-- sidebar -->
+    <div class="side">
+      <div class="s-item"><span>⌂</span>Command Center</div>
+      <div class="s-item on"><span>▤</span>Entreprises</div>
+      <div class="s-sub">
+        <div class="s-ent">◆ ABC SARL</div>
+        <div class="s-sub">
+          <div class="s-item">Vue d'ensemble</div>
+          <div class="s-item">Data Room</div>
+          <div class="s-item on">Transactions</div>
+          <div class="s-item">États financiers</div>
+          <div class="s-item">DSF</div>
+          <div class="s-item">Tax Intelligence</div>
+          <div class="s-item">Risques &amp; Alertes</div>
+          <div class="s-item">Rapports</div>
+        </div>
+        <div class="s-item">◇ XYZ SA</div>
+        <div class="s-item">◇ MNO Holding</div>
+        <div class="s-item" style="color:var(--cyan)">Voir tous les clients (30)</div>
+      </div>
+      <div class="s-item" style="margin-top:8px"><span>◈</span>Campagnes</div>
+      <div class="s-item"><span>≡</span>File d'attente<span class="ct">12</span></div>
+      <div class="s-item"><span>☑</span>Tâches<span class="ct">26</span></div>
+      <div class="s-item"><span>🔔</span>Notifications<span class="ct">5</span></div>
+      <div class="s-item"><span>⚖</span>Bibliothèque juridique</div>
+      <div class="s-item"><span>⚙</span>Paramètres</div>
+      <div class="s-help"><b>Besoin d'aide ?</b>Demandez à Review.AI</div>
+    </div>
+
+    <!-- main -->
+    <div class="main">
+      <div class="ent-head">
+        <div class="ent-top">
+          <div class="ent-logo">🏢</div>
+          <div>
+            <div class="ent-name">ABC SARL <span class="pill-ok">Client actif</span></div>
+            <div class="ent-meta">
+              <span>N° CAM-2025-001</span><span>Commerce de détail</span><span>Régime réel normal</span>
+              <span>SYSCOHADA</span><span>Cameroun</span>
+            </div>
+          </div>
+          <div class="ent-act">
+            <div class="sel">2025 ▾</div>
+            <div class="sel">Actions ▾</div>
+          </div>
+        </div>
+        <div class="tabs">
+          <div class="tab">Vue d'ensemble</div>
+          <div class="tab">Data Room</div>
+          <div class="tab on">Transactions</div>
+          <div class="tab">États financiers</div>
+          <div class="tab">DSF</div>
+          <div class="tab">Tax Intelligence</div>
+          <div class="tab">Risques</div>
+          <div class="tab">Rapports</div>
+        </div>
+      </div>
+
+      <div class="trx">
+        <div class="trx-nav">← Retour aux transactions</div>
+        <div class="trx-head">
+          <div>
+            <div class="trx-id">Transaction #TRX-2025-008472</div>
+            <div class="trx-meta">
+              <span>📅 15 mars 2025</span><span>Journal : VTE</span>
+              <span>Référence : FAC-2025-034</span><span style="color:#34D399">✓ Comptabilisée</span>
+            </div>
+          </div>
+          <div class="trx-btns">
+            <div class="sel">Actions ▾</div>
+            <button class="btn-o">Voir les écritures</button>
+          </div>
+        </div>
+
+        <div class="vtabs">
+          <div class="vtab on">Vue arborescente</div>
+          <div class="vtab">Vue graphique</div>
+          <div class="vtab">Vue chronologique</div>
+        </div>
+
+        <!-- IMPACT GRAPH -->
+        <div class="graph">
+          <div class="g-cols">
+            <div class="g-col">
+              <div class="g-lbl">Opération</div>
+              <div class="node n-blue" style="min-height:150px">
+                <div class="nt">▣ Opération comptable</div>
+                <div class="ns" style="margin-bottom:8px">Facturation prestation<br>Client X</div>
+                <div class="nv">10 000 000 FCFA</div>
+                <div class="nv" style="color:#FCD34D">+ TVA 1 925 000</div>
+                <div class="nv" style="margin-top:6px;opacity:.7">411 / 706 / 4432</div>
+              </div>
+            </div>
+            <div class="g-col">
+              <div class="g-lbl">1. Interprétation comptable</div>
+              <div class="node n-green">
+                <div class="nt">◈ Prestation de services</div>
+                <div class="ns">Vente de services locale</div>
+                <div class="conf">⚡ Règles de détection <b>confiance 98%</b></div>
+              </div>
+            </div>
+            <div class="g-col">
+              <div class="g-lbl">2. Impacts comptables</div>
+              <div class="node n-cyan"><div class="nt">▤ Compte 411</div><div class="ns">Créance client</div><div class="nv">+ 11 925 000</div></div>
+              <div class="node n-cyan"><div class="nt">▤ Compte 706</div><div class="ns">Chiffre d'affaires</div><div class="nv">+ 10 000 000</div></div>
+              <div class="node n-cyan"><div class="nt">▤ Compte 4432</div><div class="ns">TVA collectée</div><div class="nv">+ 1 925 000</div></div>
+            </div>
+            <div class="g-col">
+              <div class="g-lbl">3. États financiers</div>
+              <div class="node n-violet"><div class="nt">▦ Compte de résultat</div><div class="nv">+ 10 000 000</div><div class="ns">Produits d'exploitation</div></div>
+              <div class="node n-violet"><div class="nt">▦ Bilan</div><div class="nv">+ 11 925 000</div><div class="ns">Créances clients</div></div>
+            </div>
+            <div class="g-col">
+              <div class="g-lbl">4. Impacts fiscaux</div>
+              <div class="node n-amber"><div class="nt">⚖ TVA collectée</div><div class="nv">1 925 000</div><div class="ns">Taux 19,25%</div></div>
+              <div class="node n-amber"><div class="nt">⚖ Base IS</div><div class="nv">+ 10 000 000</div><div class="ns">(sauf exonération)</div></div>
+              <div class="node n-amber"><div class="nt">⚖ DSF</div><div class="ns">Tableaux concernés<br>(T1, T2, T5)</div></div>
+            </div>
+            <div class="g-col">
+              <div class="g-lbl">5. Obligations déclaratives</div>
+              <div class="node n-blue"><div class="nt">▤ Déclaration TVA</div><div class="ns">Mars 2025</div><div class="nv">1 925 000</div><div class="ns" style="color:#FCD34D">(à rapprocher)</div></div>
+              <div class="node n-blue"><div class="nt">▤ DSF 2025</div><div class="ns">Chiffre d'affaires</div></div>
+              <div class="node n-blue"><div class="nt">▤ Paiements</div><div class="ns">Échéances TVA</div></div>
+            </div>
+            <div class="g-col">
+              <div class="g-lbl">6. Règles &amp; Contrôles</div>
+              <div class="node n-green"><div class="nt">§ CGI Art. 127</div><div class="ns">Opérations imposables</div></div>
+              <div class="node n-green"><div class="nt">§ Règle d'exigibilité</div><div class="ns">Encaissement<br>(sauf option débits)</div></div>
+              <div class="node n-green"><div class="nt">✓ Contrôles automatiques</div><div class="ns">6 tests appliqués</div>
+                <div class="ns" style="margin-top:4px">✓ 5 OK &nbsp;<span style="color:#FCD34D">⚠ 1 alerte</span></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- detail tabs -->
+        <div class="dtabs">
+          <div class="dtab on">Détails</div>
+          <div class="dtab">Écritures (3)</div>
+          <div class="dtab">Documents liés (2)</div>
+          <div class="dtab">Règles applicables (3)</div>
+          <div class="dtab">Impacts</div>
+          <div class="dtab">Contrôles (6)</div>
+          <div class="dtab">Discussions</div>
+        </div>
+
+        <div class="dgrid">
+          <div class="card">
+            <h4>Résumé de l'opération</h4>
+            <div class="kv"><span class="k">Date</span><span class="v">15 mars 2025</span></div>
+            <div class="kv"><span class="k">Journal</span><span class="v">VTE – Ventes</span></div>
+            <div class="kv"><span class="k">Référence</span><span class="v">FAC-2025-034</span></div>
+            <div class="kv"><span class="k">Libellé</span><span class="v" style="font-size:10.5px">Facture prestation – Client X</span></div>
+            <div class="kv"><span class="k">Montant HT</span><span class="v">10 000 000</span></div>
+            <div class="kv"><span class="k">TVA (19,25%)</span><span class="v">1 925 000</span></div>
+            <div class="kv"><span class="k">Montant TTC</span><span class="v">11 925 000</span></div>
+            <div class="kv"><span class="k">Client</span><span class="v">Client X (C-001)</span></div>
+            <div class="kv"><span class="k">Statut</span><span class="v" style="color:#34D399">✓ Comptabilisée</span></div>
+          </div>
+
+          <div class="card">
+            <h4>Répartition des impacts</h4>
+            <div class="donut-wrap">
+              <svg width="120" height="120" viewBox="0 0 42 42">
+                <circle cx="21" cy="21" r="15.9" fill="none" stroke="#8B5CF6" stroke-width="6" stroke-dasharray="46 54" stroke-dashoffset="0"/>
+                <circle cx="21" cy="21" r="15.9" fill="none" stroke="#F59E0B" stroke-width="6" stroke-dasharray="9 91" stroke-dashoffset="-46"/>
+                <circle cx="21" cy="21" r="15.9" fill="none" stroke="#22D3EE" stroke-width="6" stroke-dasharray="33 67" stroke-dashoffset="-55"/>
+                <circle cx="21" cy="21" r="15.9" fill="none" stroke="#10B981" stroke-width="6" stroke-dasharray="12 88" stroke-dashoffset="-88"/>
+                <text x="21" y="20" text-anchor="middle" font-size="5" fill="#E8EFF8" font-weight="700" font-family="JetBrains Mono">10,0 M</text>
+                <text x="21" y="25" text-anchor="middle" font-size="2.6" fill="#5C7092" font-family="Inter">Montant HT</text>
+              </svg>
+              <div class="leg">
+                <div class="leg-row"><span class="leg-dot" style="background:#8B5CF6"></span>Compte de résultat<span class="leg-v">10,0 M</span></div>
+                <div class="leg-row"><span class="leg-dot" style="background:#F59E0B"></span>TVA collectée<span class="leg-v">1,925 M</span></div>
+                <div class="leg-row"><span class="leg-dot" style="background:#22D3EE"></span>Créance client<span class="leg-v">11,925 M</span></div>
+                <div class="leg-row"><span class="leg-dot" style="background:#10B981"></span>Base IS<span class="leg-v">10,0 M</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h4>Documents liés <a>Voir tout</a></h4>
+            <div class="doc"><div class="di">PDF</div><div><div class="dn">FAC-2025-034.pdf</div><div class="dd">Facture client</div></div><div class="dt">15 mars 2025</div></div>
+            <div class="doc"><div class="di">PDF</div><div><div class="dn">Relevé client X.pdf</div><div class="dd">Justificatif</div></div><div class="dt">20 mars 2025</div></div>
+            <h4 style="margin-top:16px">Règles applicables <a>Voir tout</a></h4>
+            <div class="rule"><div class="ri">§</div><div><div class="rn">CGI Art. 127</div><div class="rd">Opérations imposables à la TVA</div></div></div>
+            <div class="rule"><div class="ri">§</div><div><div class="rn">CGI Art. 142</div><div class="rd">Taux réduits et exonérations</div></div></div>
+            <div class="rule"><div class="ri">§</div><div><div class="rn">Règle d'exigibilité TVA</div><div class="rd">Encaissement des prestations</div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="insight">
+        <div class="ins-i">💡</div>
+        <div>
+          <div class="ins-t">Insight Review.AI</div>
+          <div class="ins-d">Ce type d'opération représente 28% de votre chiffre d'affaires 2025. Les écarts de TVA observés concernent principalement les mois de mars et juillet.</div>
+        </div>
+        <button class="ins-b">Voir l'analyse globale →</button>
+      </div>
+    </div>
+
+    <!-- assistant -->
+    <div class="asst">
+      <div class="asst-h"><span class="sp">✦</span>Assistant Review.AI</div>
+      <div class="asst-box">
+        <div class="asst-q">Pourquoi cette opération est-elle importante ?</div>
+        <div class="asst-a">Cette opération représente une prestation de services taxable à la TVA.
+          Elle impacte votre chiffre d'affaires, génère une créance client, doit être déclarée en TVA
+          et intégrée dans la DSF. Je détecte un écart potentiel sur la déclaration TVA de mars 2025.</div>
+      </div>
+      <div class="asst-in">
+        <input placeholder="Poser une autre question">
+        <button>➤</button>
+      </div>
+
+      <div class="alert-c">
+        <div class="alert-h">⚠ Alerte sur cette transaction</div>
+        <div class="alert-t">▲ TVA potentiellement non déclarée</div>
+        <div class="alert-d">Aucun montant correspondant n'a été identifié dans la déclaration TVA de mars 2025.</div>
+        <div class="alert-m">
+          <div><div style="font-size:10.5px;color:var(--txt3)">Impact estimé</div><div class="am">1 925 000 FCFA</div></div>
+          <span class="ab">Risque élevé</span>
+        </div>
+        <div class="alert-btns">
+          <button class="ab1">Voir le détail</button>
+          <button class="ab2">Marquer comme traité</button>
+        </div>
+      </div>
+
+      <div class="sim">
+        <div class="sim-h">Transactions similaires <a>Voir tout</a></div>
+        <div class="sim-r"><span class="sim-ok">✓</span><div><div class="sim-id">TRX-2025-007921</div><div class="sim-d">12 mars 2025</div></div><span class="sim-v">8 500 000</span></div>
+        <div class="sim-r"><span class="sim-ok">✓</span><div><div class="sim-id">TRX-2025-006334</div><div class="sim-d">5 mars 2025</div></div><span class="sim-v">12 000 000</span></div>
+        <div class="sim-r"><span class="sim-ok">✓</span><div><div class="sim-id">TRX-2025-004198</div><div class="sim-d">21 févr. 2025</div></div><span class="sim-v">6 250 000</span></div>
+        <div class="sim-r"><span class="sim-ok">✓</span><div><div class="sim-id">TRX-2025-002781</div><div class="sim-d">3 févr. 2025</div></div><span class="sim-v">9 800 000</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// neural network background
+(function(){
+  var svg=document.getElementById('neural');
+  var W=window.innerWidth,H=window.innerHeight;
+  svg.setAttribute('viewBox','0 0 '+W+' '+H);
+  var nodes=[],N=46;
+  for(var i=0;i<N;i++) nodes.push({x:Math.random()*W,y:Math.random()*H});
+  var s='';
+  for(var i=0;i<N;i++){
+    for(var j=i+1;j<N;j++){
+      var dx=nodes[i].x-nodes[j].x, dy=nodes[i].y-nodes[j].y;
+      if(Math.sqrt(dx*dx+dy*dy)<190)
+        s+='<line x1="'+nodes[i].x+'" y1="'+nodes[i].y+'" x2="'+nodes[j].x+'" y2="'+nodes[j].y+'"/>';
+    }
+  }
+  for(var i=0;i<N;i++)
+    s+='<circle cx="'+nodes[i].x+'" cy="'+nodes[i].y+'" r="2" style="animation-delay:'+(Math.random()*4).toFixed(2)+'s"/>';
+  svg.innerHTML=s;
+})();
+
+// rising particles
+(function(){
+  var c=document.getElementById('particles');
+  for(var i=0;i<28;i++){
+    var p=document.createElement('div');
+    p.className='p';
+    var sz=(Math.random()*2.5+1).toFixed(1);
+    p.style.width=sz+'px'; p.style.height=sz+'px';
+    p.style.left=(Math.random()*100)+'%';
+    p.style.top=(55+Math.random()*40)+'%';
+    p.style.animation='rise '+(5+Math.random()*6).toFixed(1)+'s linear '+(Math.random()*7).toFixed(1)+'s infinite';
+    c.appendChild(p);
+  }
+})();
+
+function toLogin(){
+  document.getElementById('landing').classList.add('gone');
+  setTimeout(function(){
+    document.getElementById('landing').style.display='none';
+    document.getElementById('login').classList.add('on');
+  },700);
+}
+function toApp(){
+  document.getElementById('login').style.display='none';
+  document.getElementById('intake').classList.remove('on');
+  document.getElementById('intake').style.display='none';
+  document.getElementById('app').classList.add('on');
+}
+function toIntake(){
+  document.getElementById('login').style.display='none';
+  document.getElementById('intake').classList.add('on');
+}
+function runIntake(){
+  var proc=document.getElementById('proc');
+  proc.classList.add('on');
+  var steps=document.querySelectorAll('#steps .step');
+  var i=0;
+  function next(){
+    if(i>0){steps[i-1].classList.remove('run');steps[i-1].classList.add('done');
+            steps[i-1].querySelector('.si').textContent='✓';
+            steps[i-1].querySelector('.sv').textContent=steps[i-1].dataset.v;}
+    if(i<steps.length){
+      steps[i].classList.add('run');
+      steps[i].querySelector('.si').textContent='◌';
+      i++; setTimeout(next, 620);
+    } else {
+      document.getElementById('proc-label').textContent='Lot #0087 traité — 24 fichiers, 10 dossiers';
+      document.querySelector('.spin').style.display='none';
+      document.getElementById('res').classList.add('on');
+      setTimeout(function(){
+        document.getElementById('res').scrollIntoView({behavior:'smooth',block:'start'});
+      },200);
+    }
+  }
+  next();
+}
+// interactions
+document.addEventListener('click',function(e){
+  var t=e.target.closest('.tab,.vtab,.dtab');
+  if(!t) return;
+  var group=t.classList.contains('tab')?'.tab':t.classList.contains('vtab')?'.vtab':'.dtab';
+  t.parentElement.querySelectorAll(group).forEach(function(x){x.classList.remove('on')});
+  t.classList.add('on');
+});
+document.addEventListener('click',function(e){
+  var n=e.target.closest('.node');
+  if(n) alert("Navigation dans le graphe d'impact\n\nChaque nœud ouvre son objet : écriture source, compte, ligne d'état financier, règle applicable ou contrôle — avec sa chaîne de preuve complète (evidence_record).");
+});
+</script>
+</body>
+</html>
