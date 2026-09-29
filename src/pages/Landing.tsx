@@ -16,7 +16,7 @@ export default function Landing() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        background: "radial-gradient(ellipse at 50% 45%, #0D1A2E 0%, #070C14 60%)",
+        background: "radial-gradient(ellipse at 50% 40%, #ffffff 0%, var(--bg2) 70%)",
         textAlign: "center",
         padding: 24,
       }}
@@ -26,7 +26,7 @@ export default function Landing() {
         <br />
         <span
           style={{
-            background: "linear-gradient(100deg, var(--cyan), var(--blue) 45%, var(--violet))",
+            background: "linear-gradient(100deg, #0f172a, var(--accent) 60%, #4338ca)",
             WebkitBackgroundClip: "text",
             backgroundClip: "text",
             color: "transparent",
@@ -61,9 +61,9 @@ export default function Landing() {
           fontWeight: 600,
           cursor: "pointer",
           fontFamily: "var(--sans)",
-          background: "linear-gradient(135deg, var(--cyan), var(--indigo))",
-          color: "#05101A",
-          boxShadow: "0 8px 30px rgba(34,211,238,.32)",
+          background: "var(--accent)",
+          color: "#ffffff",
+          boxShadow: "0 6px 20px rgba(29,78,216,.22)",
         }}
       >
         Entrer dans Review.AI →

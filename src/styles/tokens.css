@@ -1,29 +1,50 @@
-/* Review.AI — design tokens (SPEC §122 ; OPEN-05 : thème sombre retenu) */
+/* Review.AI — design tokens.
+ *
+ * Thème clair, décidé pour une raison précise : ce sont des chiffres. Un
+ * comptable lit une balance de 684 lignes pendant des heures, compare des
+ * montants, cherche un écart. Le fond sombre est fait pour le code et les
+ * tableaux de bord de supervision ; il fatigue sur de la lecture dense de
+ * nombres et rend l'impression illisible.
+ *
+ * Trois principes :
+ *   — le chiffre prime sur le décor ; rien ne doit concurrencer un montant ;
+ *   — la couleur ne sert qu'à signaler un état, jamais à décorer ;
+ *   — les montants sont en chasse fixe tabulaire, pour s'aligner colonne par
+ *     colonne sans que l'œil ait à chercher.
+ */
 :root {
-  --bg: #070c14;
-  --bg2: #0a1220;
-  --panel: #0e1726;
-  --panel2: #111f33;
-  --line: rgba(120, 160, 220, 0.13);
+  --bg: #f6f7f9;
+  --bg2: #eef1f5;
+  --panel: #ffffff;
+  --panel2: #fafbfc;
+  --line: #e2e6ec;
+  --line-strong: #cbd2dc;
 
-  --txt: #e8eff8;
-  --txt2: #8fa3bf;
-  --txt3: #5c7092;
+  --txt: #0f172a;
+  --txt2: #566175;
+  --txt3: #8a93a4;
 
-  --cyan: #22d3ee;
-  --blue: #3b82f6;
-  --indigo: #6366f1;
-  --violet: #8b5cf6;
-  --green: #10b981;
-  --amber: #f59e0b;
-  --red: #ef4444;
+  /* Une seule couleur d'action. Tout le reste est sémantique. */
+  --accent: #1d4ed8;
+  --accent-soft: #eef2ff;
 
-  --sans: "Inter", sans-serif;
-  --mono: "JetBrains Mono", monospace;
+  --green: #047857;
+  --green-soft: #ecfdf5;
+  --amber: #b45309;
+  --amber-soft: #fffbeb;
+  --red: #b91c1c;
+  --red-soft: #fef2f2;
+  --slate-soft: #f1f5f9;
 
-  --r-sm: 8px;
-  --r: 12px;
-  --r-lg: 18px;
+  --sans:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --r-sm: 6px;
+  --r: 10px;
+  --r-lg: 14px;
+
+  --shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
 }
 
 * {
@@ -42,6 +63,82 @@ body {
   font-family: var(--sans);
   background: var(--bg);
   color: var(--txt);
-  font-size: 13px;
+  font-size: 13.5px;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Tous les montants : chasse fixe, chiffres tabulaires, alignés à droite.
+   C'est ce qui permet de comparer deux colonnes sans les lire. */
+.num {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12.5px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.neg {
+  color: var(--red);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--txt3);
+  text-align: left;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: var(--panel2);
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
 }
