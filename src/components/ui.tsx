@@ -5,7 +5,7 @@
  */
 import type { CSSProperties, ReactNode } from "react";
 
-import type { CommentStatus, Severity, VersionState } from "@/lib/api";
+import type { CommentStatus, Severity, VatSeverity, VersionState } from "@/lib/api";
 
 /* ─── Montants ─────────────────────────────────────────────────────────── */
 
@@ -230,6 +230,23 @@ const SEVERITIES: Record<Severity, { label: string; tone: Tone }> = {
 
 export function SeverityChip({ severity }: { severity: Severity }) {
   const { label, tone } = SEVERITIES[severity];
+  return <Badge tone={tone}>{label}</Badge>;
+}
+
+/** Gravité d'un constat de revue fiscale.
+ *
+ * Le vocabulaire diffère de celui de l'Audit Gate, et ce n'est pas une
+ * inconséquence : un contrôle de balance bloque une production, un constat
+ * fiscal chiffre un risque. Aucun d'eux ne conclut à un redressement.
+ */
+const VAT_SEVERITIES: Record<VatSeverity, { label: string; tone: Tone }> = {
+  RISQUE: { label: "Risque latent", tone: "bad" },
+  A_JUSTIFIER: { label: "À justifier", tone: "warn" },
+  INFORMATION: { label: "Information", tone: "neutral" },
+};
+
+export function VatSeverityChip({ severity }: { severity: VatSeverity }) {
+  const { label, tone } = VAT_SEVERITIES[severity];
   return <Badge tone={tone}>{label}</Badge>;
 }
 

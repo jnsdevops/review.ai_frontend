@@ -3,6 +3,8 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import "./styles/tokens.css";
+import Client from "./pages/Client";
+import Clients from "./pages/Clients";
 import Dossier from "./pages/Dossier";
 import Dossiers from "./pages/Dossiers";
 import Intake from "./pages/Intake";
@@ -19,6 +21,22 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           element={
             <Shell>
               <Intake />
+            </Shell>
+          }
+        />
+        <Route
+          path="/clients"
+          element={
+            <Shell>
+              <Clients />
+            </Shell>
+          }
+        />
+        <Route
+          path="/clients/:entityId"
+          element={
+            <Shell>
+              <Client />
             </Shell>
           }
         />

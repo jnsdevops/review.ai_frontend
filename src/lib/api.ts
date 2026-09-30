@@ -240,6 +240,159 @@ export interface NotesSummary {
   stale: number;
 }
 
+/* ─── Portefeuille du cabinet ──────────────────────────────────────────── */
+
+export interface VatSummary {
+  exercise_year: number;
+  declarations: number;
+  review_id: string | null;
+  risque_total: string | null;
+  open_risks: number;
+  findings: number;
+  reconstruction_complete: boolean | null;
+}
+
+export interface ClientSummary {
+  entity_id: string;
+  legal_name: string;
+  niu: string | null;
+  rccm: string | null;
+  /** Déclaré au référentiel, ou seulement déduit des documents importés. */
+  is_registered: boolean;
+  balances: number;
+  blocked: number;
+  awaiting: number;
+  validated: number;
+  exercises: number[];
+  last_exercise: number | null;
+  vat: VatSummary[];
+}
+
+export interface ClientDetail extends ClientSummary {
+  versions: BalanceVersion[];
+}
+
+/* ─── Revue fiscale — TVA collectée ────────────────────────────────────── */
+
+export interface VatDeclarationRequest {
+  month: number;
+  base_taxable?: string | number;
+  base_export?: string | number;
+  base_exoneree?: string | number;
+  tva_collectee?: string | number;
+  chiffre_affaires_global?: string | number | null;
+  source?: string;
+  reference?: string | null;
+  created_by?: string | null;
+}
+
+export interface VatDeclaration {
+  declaration_id: string;
+  entity_id: string;
+  exercise_year: number;
+  month: number;
+  base_taxable: string;
+  base_export: string;
+  base_exoneree: string;
+  tva_collectee: string;
+  chiffre_affaires_global: string | null;
+  source: string;
+  reference: string | null;
+  /** TVA déclarée − base déclarée × taux : une déclaration doit d'abord
+   *  être cohérente avec elle-même. */
+  ecart_interne: string;
+  ecart_chiffre_affaires: string | null;
+}
+
+/** Les six faits générateurs du cahier des charges. */
+export type Regime =
+  | "LIVRAISON"
+  | "PRESTATION"
+  | "ENCAISSEMENT"
+  | "IMMOBILIER"
+  | "LOCATION"
+  | "LASM";
+export type Traitement = "TAXABLE" | "EXPORT" | "EXONERE";
+export type TauxCategorie = "NORMAL" | "REDUIT" | "ZERO";
+
+export interface VatRegimeRequest {
+  account_number: string;
+  regime: Regime;
+  traitement: Traitement;
+  justification: string;
+  taux_categorie?: TauxCategorie;
+  account_label?: string | null;
+  decided_by?: string | null;
+}
+
+/** La fiche d'environnement fiscal — quatorze mentions, CDC §1.1. */
+export interface FiscalEnvironment {
+  denomination: string | null;
+  activites: string | null;
+  devise: string;
+  juridiction: string | null;
+  /** null = non renseigné, ce qui n'est pas « non ». */
+  option_debits: boolean | null;
+  rccm: string | null;
+  niu: string | null;
+  regime_imposition: string | null;
+  centre_rattachement: string | null;
+  derogation_date: string | null;
+  derogation_duree: string | null;
+  derogation_regime_fiscal: string | null;
+  derogation_regime_douanier: string | null;
+  natures_operations: string[];
+  activites_taxables: string[];
+  activites_exonerees: string[];
+  particularites: string | null;
+  is_declared: boolean;
+  updated_by?: string | null;
+}
+
+export interface FiscalEnvironmentPayload extends FiscalEnvironment {
+  entity_id: string;
+  missing_mentions: string[];
+}
+
+export interface VatRegimeDecision extends VatRegimeRequest {
+  decision_id: string;
+  entity_id: string;
+  taux_categorie: TauxCategorie;
+}
+
+export type VatSeverity = "RISQUE" | "A_JUSTIFIER" | "INFORMATION";
+
+export interface VatFinding {
+  finding_id: string;
+  code: string;
+  severity: VatSeverity;
+  test: string;
+  message: string;
+  amount: string | null;
+  accounts: string[];
+  status: FindingStatus;
+  resolution: string | null;
+}
+
+export interface VatReview {
+  review_id: string;
+  entity_id: string;
+  exercise_year: number;
+  rule_version: string;
+  taux: string;
+  base_livraison: string;
+  tva_livraison: string;
+  base_prestation: string;
+  tva_prestation: string;
+  base_declaree: string;
+  tva_declaree: string;
+  risque_livraison: string;
+  risque_prestation: string;
+  risque_total: string;
+  reconstruction_complete: boolean;
+  findings: VatFinding[];
+}
+
 /* ─── Transport ────────────────────────────────────────────────────────── */
 
 export class ApiError extends Error {
@@ -362,4 +515,150 @@ export const api = {
     ),
   commentHistory: (notePk: string) =>
     request<NoteComment[]>(`/notes/${notePk}/history`),
+
+  /* Portefeuille */
+  clients: () => request<ClientSummary[]>("/clients"),
+  client: (entityId: string) =>
+    request<ClientDetail>(`/clients/${encodeURIComponent(entityId)}`),
+
+  /* Environnement fiscal */
+  fiscalEnvironment: (entityId: string) =>
+    request<FiscalEnvironmentPayload>(
+      `/tax/entities/${encodeURIComponent(entityId)}/fiscal-environment`,
+    ),
+  saveFiscalEnvironment: (entityId: string, body: Partial<FiscalEnvironment>) =>
+    request<FiscalEnvironmentPayload>(
+      `/tax/entities/${encodeURIComponent(entityId)}/fiscal-environment`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      },
+    ),
+
+  /** Télécharge la fiche au format Word — livrable du cahier des charges. */
+  exportFiscalEnvironment: async (entityId: string, year?: number) => {
+    const res = await fetch(
+      `${BASE}/tax/entities/${encodeURIComponent(entityId)}/fiscal-environment/export` +
+        (year ? `?exercise_year=${year}` : ""),
+    );
+    if (!res.ok) {
+      let detail = res.statusText;
+      try {
+        detail = (await res.json()).detail ?? detail;
+      } catch {
+        // réponse non JSON : on garde le statut
+      }
+      throw new ApiError(detail, res.status);
+    }
+    const header = (name: string) => res.headers.get(`x-review-fiche-${name}`);
+    const blob = await res.blob();
+    const filename = "Fiche_environnement_fiscal.docx";
+    if (header("mentions") === null) return { blob, filename, report: null };
+    return {
+      blob,
+      filename,
+      report: {
+        complete: header("complete") === "true",
+        mentions: Number(header("mentions")),
+        filled: Number(header("filled") ?? 0),
+        missing: Number(header("missing") ?? 0),
+        // Mentions absentes qui changent la base taxable, et non la seule
+        // complétude formelle du document.
+        blindSpots: Number(header("blind-spots") ?? 0),
+      },
+    };
+  },
+
+  /* Revue fiscale — TVA */
+  vatDeclarations: (entityId: string, year: number) =>
+    request<VatDeclaration[]>(
+      `/tax/entities/${encodeURIComponent(entityId)}/vat/${year}/declarations`,
+    ),
+  saveVatDeclaration: (
+    entityId: string,
+    year: number,
+    body: VatDeclarationRequest,
+  ) =>
+    request<VatDeclaration>(
+      `/tax/entities/${encodeURIComponent(entityId)}/vat/${year}/declarations`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      },
+    ),
+  vatRegimes: (entityId: string) =>
+    request<VatRegimeDecision[]>(
+      `/tax/entities/${encodeURIComponent(entityId)}/vat/regimes`,
+    ),
+  decideVatRegime: (entityId: string, body: VatRegimeRequest) =>
+    request<VatRegimeDecision>(
+      `/tax/entities/${encodeURIComponent(entityId)}/vat/regimes`,
+      json(body),
+    ),
+  runVatReview: (versionId: string, actorId?: string) =>
+    request<VatReview>(
+      `/tax/balances/${versionId}/vat-review${actorId ? `?actor_id=${actorId}` : ""}`,
+      { method: "POST" },
+    ),
+  vatReview: (entityId: string, year: number) =>
+    request<VatReview>(
+      `/tax/entities/${encodeURIComponent(entityId)}/vat/${year}/review`,
+    ),
+  resolveVatFinding: (
+    findingId: string,
+    status: FindingStatus,
+    resolution: string,
+    actorId?: string,
+  ) =>
+    request<VatReview>(
+      `/tax/vat/findings/${findingId}`,
+      json({ status, resolution, actor_id: actorId ?? null }),
+    ),
+
+  /** Télécharge le classeur du cabinet.
+   *
+   * Pas de `request()` ici : la réponse est un fichier, pas du JSON. Les
+   * en-têtes `X-Review-Export-*` disent ce que le classeur contient et ce
+   * qu'il ne contient pas — ils sont remontés pour être affichés, plutôt que
+   * de laisser l'utilisateur ouvrir le fichier pour le découvrir.
+   */
+  exportVatReview: async (entityId: string, year: number) => {
+    const res = await fetch(
+      `${BASE}/tax/entities/${encodeURIComponent(entityId)}/vat/${year}/export`,
+    );
+    if (!res.ok) {
+      let detail = res.statusText;
+      try {
+        detail = (await res.json()).detail ?? detail;
+      } catch {
+        // réponse non JSON : on garde le statut
+      }
+      throw new ApiError(detail, res.status);
+    }
+    const header = (name: string) => res.headers.get(`x-review-export-${name}`);
+    const blob = await res.blob();
+    const filename = `Revue_fiscale_TVA_${year}.xlsx`;
+
+    // Un intermédiaire — proxy, passerelle, CORS mal configuré — peut retirer
+    // les en-têtes personnalisés. Les lire comme des zéros annoncerait
+    // « 0 mois déclarés » sur un classeur qui en porte douze : un chiffre faux
+    // est pire qu'une absence de chiffre. En leur absence, pas de rapport.
+    if (header("months") === null) return { blob, filename, report: null };
+
+    return {
+      blob,
+      filename,
+      report: {
+        complete: header("complete") === "true",
+        months: Number(header("months")),
+        monthsMissing: Number(header("months-missing") ?? 0),
+        accounts: Number(header("accounts") ?? 0),
+        templateFixes: Number(header("template-fixes") ?? 0),
+        notFilled: Number(header("not-filled") ?? 0),
+        sheetsRemoved: Number(header("sheets-removed") ?? 0),
+      },
+    };
+  },
 };

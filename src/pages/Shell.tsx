@@ -47,8 +47,11 @@ export default function Shell({ children }: { children: ReactNode }) {
             Review<span style={{ color: "var(--accent)" }}>.AI</span>
           </NavLink>
           <nav style={{ display: "flex", gap: 3 }}>
+            <NavLink to="/clients" style={link}>
+              Portefeuille
+            </NavLink>
             <NavLink to="/dossiers" style={link}>
-              Dossiers
+              Balances
             </NavLink>
             <NavLink to="/intake" style={link}>
               Déposer
